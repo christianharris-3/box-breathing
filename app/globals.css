@@ -38,9 +38,14 @@ body {
   display: flex;
 }
 
-.top-text {
+.top-bottom-text {
   height: 75px;
-  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.left-right-text {
+  width: 150px;
   align-items: center;
   justify-content: center;
 }

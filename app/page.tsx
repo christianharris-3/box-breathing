@@ -1,9 +1,9 @@
 function AnimatedBox() {
     return (
         <div className="box-breathing-container">
-            <div className="top-text">Top Text</div>
+            <div className="top-bottom-text">Top Text</div>
             <div className="middle-row">
-                <div className="left-text content">Left Text</div>
+                <div className="left-right-text">Left Text</div>
                 <div className="box">
                     <span className="background-line top"></span>
                     <span className="slider-line top"></span>
@@ -16,7 +16,7 @@ function AnimatedBox() {
 
                     <div className="content">Hello</div>
                 </div>
-                <div className="right-text">Right Text</div>
+                <div className="left-right-text">Right Text</div>
             </div>
 
             <div className="top-bottom-text">Bottom Text</div>
