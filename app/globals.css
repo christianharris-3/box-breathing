@@ -24,3 +24,85 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.box-breathing-container {
+  position: relative;
+  margin: auto;
+  width: 600px;
+  height: 450px;
+  text-align: center;
+  flex-direction: column;
+}
+
+.middle-row {
+  display: flex;
+}
+
+.top-text {
+  height: 75px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  background: #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Common line style */
+.background-line {
+  position: absolute;
+  background: #ffffff;
+}
+
+.slider-line {
+  position: absolute;
+  background: #4adafa;
+}
+
+/* Top */
+.top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+}
+
+/* Right */
+.right {
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+}
+
+/* Bottom */
+.bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+}
+
+/* Left */
+.left {
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 100%;
+}
+
+
+/* Box Text */
+
+.left-text {
+
+}
