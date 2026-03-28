@@ -40,12 +40,14 @@ body {
 
 .top-bottom-text {
   height: 75px;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .left-right-text {
   width: 150px;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
@@ -71,6 +73,7 @@ body {
 .slider-line {
   position: absolute;
   background: #4adafa;
+
 }
 
 /* Top */
