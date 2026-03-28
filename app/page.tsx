@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useRef, useState} from "react";
+import {CSSProperties, useEffect, useRef, useState} from "react";
 
 
 function percentageClamp(val: number) {
@@ -21,11 +21,36 @@ function reversemodulus(val: number) {
     return val;
 }
 
+// function AnimationSide({squareColour, fillColour, fillPercent, lineBackgroundStyle, squareBorderWidth, headSize, bodySize, tailSize, cornerRatio}:
+//                        {squareColour: string, fillColour: string, fillPercent: number, lineBackgroundStyle: CSSProperties, squareBorderWidth: number, headSize: number, bodySize: number, tailSize: number, cornerRatio: number}) {
+//     return (
+//         <div style={{ ...lineBackgroundStyle, width: `calc(100% - ${squareBorderWidth*2}px)`, top: 0, left: squareBorderWidth,
+//             backgroundImage: `linear-gradient(to right,
+//                 ${squareColour} ${percentageClamp((((fillPercent - 100 - bodySize - tailSize) / 100 - (cornerRatio)) / (1 - cornerRatio)) * 100)}%,
+//                 ${fillColour} ${percentageClamp((((fillPercent - 100 - bodySize) / 100 - (cornerRatio)) / (1 - cornerRatio)) * 100)}%,
+//                 ${fillColour} ${percentageClamp((((fillPercent - 100) / 100 - (cornerRatio)) / (1 - cornerRatio)) * 100)}%,
+//                 ${squareColour} ${percentageClamp((((fillPercent - 100 + headSize) / 100 - (cornerRatio)) / (1 - cornerRatio)) * 100)}%)`}}>
+//         </div>
+//     )
+// }
+//
+// function AnimationCorner({squareColour, fillColour, fillPercent,
+//                              lineBackgroundStyle, cornerOffset, headSize, bodySize, tailSize, cornerRatio, cornerRatioTail, borderRadius}:
+//                          {squareColour: string, fillColour: string, fillPercent: number, lineBackgroundStyle: CSSProperties, cornerOffset: number, headSize: number, bodySize: number, tailSize: number, cornerRatio: number, cornerRatioTail: number, borderRadius: number}) {
+//     return (
+//         <div style={{ ...lineBackgroundStyle, top: 0, left: 0, borderTopLeftRadius: borderRadius,
+//         backgroundImage: `conic-gradient(from 270deg at 100% 100%,
+//                 ${squareColour} ${degClamp((fillPercent - 100 + cornerOffset - bodySize - tailSize) / cornerRatioTail)}deg,
+//                 ${fillColour} ${degClamp((fillPercent - 100 + cornerOffset - bodySize) / cornerRatioTail)}deg,
+//                 ${fillColour} ${degClamp((fillPercent - 100 + cornerOffset) / cornerRatio)}deg,
+//                 ${squareColour} ${degClamp((fillPercent - 100 + cornerOffset + headSize) / cornerRatio)}deg)`}}>
+//         </div>
+//     )
+// }
+
 function SquareAnimation({fillPercent, fillColour, squareColour, countNumber }:
                          {fillPercent: number, fillColour: string, squareColour: string, countNumber: number}) {
 
-    // const backgroundColour = useRef("#ffffff");
-    // const fillColour = useRef("#000000");
 
     const borderRadius = "10px";
     const squareBorderWidth = 25;
@@ -40,8 +65,10 @@ function SquareAnimation({fillPercent, fillColour, squareColour, countNumber }:
     const cornerTailSize = tailSize;
     const cornerRatioTail = cornerRatio;
 
+    const pos: ("absolute" | "relative" | "fixed") = "absolute";
+
     const lineBackgroundStyle = {
-        position: "absolute",
+        position: pos,
         background: squareColour,
         height: `${squareBorderWidth}px`,
         width: `${squareBorderWidth}px`,
@@ -162,25 +189,24 @@ export default function AnimatedBox() {
         }
     }
 
-    // update timer and text displays
-    function updateTextAnimation(value: number) {
-        let sideProgress = Math.floor(value/100*sideDuration-0.5);
-        if (sideProgress < 0) sideProgress = sideDuration*4-1
-
-        setCountNumber(sideProgress % sideDuration + 1);
-
-        const side = Math.floor(value/100);
-        setShowLeftText(side == 0 ? 1 : 0);
-        setShowTopText(side == 1 ? 1 : 0);
-        setShowRightText(side == 2 ? 1 : 0);
-        setShowBottomText(side == 3 ? 1 : 0);
-    }
-
     // manage animation timings-
     useEffect(() => {
-        let frameId;
+        let frameId: number;
 
-        const animate = (time) => {
+        function updateTextAnimation(value: number) {
+            let sideProgress = Math.floor(value/100*sideDuration-0.5);
+            if (sideProgress < 0) sideProgress = sideDuration*4-1
+
+            setCountNumber(sideProgress % sideDuration + 1);
+
+            const side = Math.floor(value/100);
+            setShowLeftText(side == 0 ? 1 : 0);
+            setShowTopText(side == 1 ? 1 : 0);
+            setShowRightText(side == 2 ? 1 : 0);
+            setShowBottomText(side == 3 ? 1 : 0);
+        }
+
+        const animate = (time: number) => {
             let value = time/10/sideDuration - timerValueOffset.current;
             if (value > 400) {
                 timerValueOffset.current += 400;
@@ -200,7 +226,8 @@ export default function AnimatedBox() {
 
     /// Space/arrow keys press buttons
     useEffect(() => {
-        const handler = (event)=>{
+
+        const handler = (event: KeyboardEvent)=>{
             if (event.code == "Space" || event.key == "ArrowUp") {
                 increaseButton.current?.click();
             } else if (event.key == "ArrowDown") {
