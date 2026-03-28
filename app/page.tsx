@@ -21,7 +21,8 @@ function reversemodulus(val: number) {
     return val;
 }
 
-function SquareAnimation({fillPercent, fillColour, squareColour, countNumber }) {
+function SquareAnimation({fillPercent, fillColour, squareColour, countNumber }:
+                         {fillPercent: number, fillColour: string, squareColour: string, countNumber: number}) {
 
     // const backgroundColour = useRef("#ffffff");
     // const fillColour = useRef("#000000");
