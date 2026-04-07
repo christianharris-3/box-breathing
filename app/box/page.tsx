@@ -208,7 +208,6 @@ export default function AnimatedBox() {
 
         const animate = (time: number) => {
             let value = time/10/sideDuration - timerValueOffset.current;
-            console.log("animation refresh",value);
             if (value > 400) {
                 timerValueOffset.current += 400;
                 value -= 400;
