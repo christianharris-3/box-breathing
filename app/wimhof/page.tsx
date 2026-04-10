@@ -99,12 +99,55 @@ function stepState(state: StateType, action: {type: string, text?: string}) {
     return state;
 }
 
+function getColours(timerState: string) {
+    if (timerState == "title") {
+        return [
+            "rgb(230, 235, 255)",  // Soft bluish white
+            "rgb(210, 220, 245)",  // Pale blue
+            "rgb(200, 210, 230)",  // Blue-grey
+            "rgb(220, 210, 220)",  // Subtle purple tint
+            "rgb(240, 220, 210)",  // Very soft warm tint
+            "rgb(255, 235, 220)"   // Warm neutral peach
+        ];
+    } else if (timerState == "breathing") {
+        return [
+            "rgb(255, 220, 150)",  // Warm yellow
+            "rgb(255, 200, 130)",  // Yellow-orange
+            "rgb(255, 180, 120)",  // Soft orange
+            "rgb(255, 160, 110)",  // Orange-red blend
+            "rgb(240, 140, 100)",  // Soft red-orange
+            "rgb(255, 170, 130)",  // Back toward orange
+            "rgb(255, 210, 160)"   // Return to warm yellow
+        ];
+    } else if (timerState == "holding") {
+        return [
+            "rgb(180, 210, 255)",  // Light blue
+            "rgb(140, 190, 240)",  // Calm blue
+            "rgb(100, 160, 220)",  // Deeper blue
+            "rgb(80, 130, 200)",   // Blue leaning cool
+            "rgb(70, 110, 180)",   // Deep blue
+            "rgb(90, 120, 200)",   // Slight lift
+            "rgb(120, 150, 220)",  // Return toward lighter
+            "rgb(160, 190, 240)"   // Soft exit
+        ];
+    } else if (timerState == "recovery") {
+        return [
+            "rgb(170, 200, 240)",  // Light blue
+            "rgb(190, 210, 220)",  // Blue → neutral
+            "rgb(210, 220, 190)",  // Neutral → green
+            "rgb(230, 210, 160)",  // Green → warm
+            "rgb(255, 200, 140)",  // Warm orange
+            "rgb(255, 215, 160)"   // Soft warm yellow
+        ];
+    }
+}
+
 function stepColour(
         state: {cols: Array<string>, progress: number, colsListIndex: number, colsList: Array<string>},
         action: {type: string, progress?: number, newColsList?: Array<string>}) {
 
     state = {...state}
-    
+
     if (action.type == "addColour") {
         const newCol = state.colsList.at(state.colsListIndex);
         if (newCol != null) {
@@ -219,14 +262,15 @@ export default function BreathingThing() {
 
     // move towards color channel
     useEffect(() => {
-        // while (colsInfo.cols.length < 3) {
-        //     updateColour({type: "addColour"})
-        // }
         const intervalId = setInterval(() => {
             updateColour({type: "addProgress", progress: 1})
         }, 50)
         return () => clearInterval(intervalId);
     }, [colsInfo]);
+
+    useEffect(() => {
+        updateColour({type: "updateColsList", newColsList: getColours(state.timerState)})
+    }, [state.timerState])
 
     // timer loop after breathing
     useEffect(() => {
