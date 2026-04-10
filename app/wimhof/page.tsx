@@ -99,6 +99,34 @@ function stepState(state: StateType, action: {type: string, text?: string}) {
     return state;
 }
 
+function stepColour(
+        state: {cols: Array<string>, progress: number, colsListIndex: number, colsList: Array<string>},
+        action: {type: string, progress?: number, newColsList?: Array<string>}) {
+
+    state = {...state}
+    
+    if (action.type == "addColour") {
+        const newCol = state.colsList.at(state.colsListIndex);
+        if (newCol != null) {
+            state.cols.push(newCol)
+        }
+        state.colsListIndex = (state.colsListIndex + 1) % state.colsList.length
+        state.cols = state.cols.slice(-3);
+
+    } else if (action.type == "setProgress" && action.progress != null) {
+        state.progress = action.progress;
+    } else if (action.type == "addProgress" && action.progress != null) {
+        state.progress += action.progress;
+        if (state.progress > 100) {
+            state.progress = state.progress % 100;
+            state = stepColour(state, {type: "addColour"})
+        }
+    } else if (action.type == "updateColsList" && action.newColsList != null) {
+        state.colsList = action.newColsList;
+    }
+
+    return state
+}
 
 function toTimeString(time: number) : string {
     const minutes = Math.floor(time / 60);
@@ -112,12 +140,28 @@ function toTimeString(time: number) : string {
     return minutesString+":"+seconds;
 }
 
-function BreathingThing() {
+export default function BreathingThing() {
 
     const [state, updateState] = useReducer(stepState, initialState);
-
+    const [colsInfo, updateColour] = useReducer(stepColour,
+        {cols: ["rgb(255, 240, 160)", "rgb(210, 230, 170)", "rgb(180, 220, 180)"],
+        progress:0, colsListIndex: 0,
+            // colsList: ["rgb(255, 255, 255)", "rgb(0,0,0)"]}
+        colsList: [
+            "rgb(255, 240, 160)",  // Yellow (soft)
+            "rgb(210, 230, 170)",  // Yellow → Pale Green (blend)
+            "rgb(180, 220, 180)",  // Pale Green
+            "rgb(100, 170, 130)",  // Pale → Dark Green (blend)
+            "rgb(60, 120, 80)",    // Dark Green
+            "rgb(110, 160, 200)",  // Green → Light Blue (blend)
+            "rgb(160, 200, 240)",  // Light Blue
+            "rgb(90, 100, 180)",   // Blue → Purple (blend leaning purple)
+            "rgb(150, 120, 200)"
+        ]}
+    )
 
     const [widthMul, setWidthMul] = useState(0)
+
     const [breathCount, setBreathCount] = useState(1)
 
     const squareSize = 250;
@@ -174,9 +218,15 @@ function BreathingThing() {
     }, [state]);
 
     // move towards color channel
-    // useEffect(() => {
-    //
-    // }, []);
+    useEffect(() => {
+        // while (colsInfo.cols.length < 3) {
+        //     updateColour({type: "addColour"})
+        // }
+        const intervalId = setInterval(() => {
+            updateColour({type: "addProgress", progress: 1})
+        }, 50)
+        return () => clearInterval(intervalId);
+    }, [colsInfo]);
 
     // timer loop after breathing
     useEffect(() => {
@@ -191,35 +241,42 @@ function BreathingThing() {
     }, [state])
 
     return (
-        // <div className="relative text-gray-800 font-semibold" style={{
-        //     backgroundImage: `radial-gradient(in oklch circle, ${}, ${})`
-        // }}>
-        <div className="relative text-gray-800 font-semibold">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-5 text-4xl font-semibold w-2xs text-center">
-                {state.roundTitleText}
-            </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-5 text-4xl font-semibold">
-                {state.roundDisplayText}
-            </div>
-            <div className="shadow-lg bg-blue-300 inset-0 flex items-center justify-center"
-                 style={{borderRadius: 1000, width: squareSize, height: squareSize, transform: `scale(${widthMul})`, fontSize: "40px"}}>
-                {breathCount}/{inputs.breathCount}
+        <div style={{
+            backgroundImage: `radial-gradient(in oklch circle, 
+                    ${colsInfo.cols[2]} ${colsInfo.progress-100}%, 
+                    ${colsInfo.cols[1]} ${colsInfo.progress}%, 
+                    ${colsInfo.cols[0]} ${colsInfo.progress+100}%)`
+        }}
+             className="flex flex-1 justify-center transition duration-3000 ease-in-out">
+            <div className="flex items-center">
+                <div className="relative text-gray-800 font-semibold">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-5 text-4xl font-semibold w-2xs text-center">
+                        {state.roundTitleText}
+                    </div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-5 text-4xl font-semibold">
+                        {state.roundDisplayText}
+                    </div>
+                    <div className="shadow-lg bg-blue-300 inset-0 flex items-center justify-center"
+                         style={{borderRadius: 1000, width: squareSize, height: squareSize, transform: `scale(${widthMul})`, fontSize: "40px"}}>
+                        {breathCount}/{inputs.breathCount}
+                    </div>
+                </div>
             </div>
         </div>
     )
 }
 
 
-export default function WimHof() {
-
-    const [backgroundColour, setBackgroundColour] = useState("rgb(255, 240, 160)");
-
-    return (
-        <div style={{backgroundColor: backgroundColour}}
-             className="flex flex-1 justify-center transition duration-3000 ease-in-out">
-            <div className="flex items-center">
-                <BreathingThing />
-            </div>
-        </div>
-    );
-}
+// export default function WimHof() {
+//
+//     const [backgroundColour, setBackgroundColour] = useState("rgb(255, 240, 160)");
+//
+//     return (
+//         <div style={{backgroundColor: backgroundColour}}
+//              className="flex flex-1 justify-center transition duration-3000 ease-in-out">
+//             <div className="flex items-center">
+//                 <BreathingThing />
+//             </div>
+//         </div>
+//     );
+// }
