@@ -1,6 +1,8 @@
 'use client';
 
 import {useEffect, useState, useReducer} from "react";
+import {BreathingInputs, InputsType} from "@/app/wimhof/inputs";
+
 
 interface StateType {
     pageState: string,
@@ -13,34 +15,42 @@ interface StateType {
     roundDisplayText: string,
     titleCountdown: string,
 
-    breathCountTimerOffset: number
+    breathCountTimerOffset: number,
+
+    inputs: InputsType
 }
+
 const initialState = {
     // state info
-    pageState: "breathing", // input -> breathing -> finished
+    pageState: "input", // input -> breathing -> finished
     timerState: "title", // title -> breathing -> holding -> recovery
     roundNumber: 1,
     triggerUseEffect: true,
 
     // data
     timerValue: 0,
-    roundTitleText: "initial text",
+    roundTitleText: "",
     roundDisplayText: "",
     titleCountdown: "",
 
     breathCountTimerOffset: 0,
 
+    inputs: {
+        breathingRate: 24,
+        holdDurations: [90, 120, 150, 180],
+        recoveryLength: 15,
+        breathCount: 40,
+    }
 }
+//
+// const inputs = {
+//     breathingRate: 24, // also editable but less important
+//     timerLength: [90, 120, 150, 180], // list of values
+//     recoveryLength: 15, // slider value
+//     breathCount: 40, // slider value
+// }
 
-const inputs = {
-    breathingRate: 24,
-    timerLength: 10,
-    recoveryLength: 15,
-    totalRounds: 4,
-    breathCount: 4,
-}
-
-function stepState(state: StateType, action: {type: string, text?: string}) {
+function stepState(state: StateType, action: {type: string, text?: string, inputs?: InputsType}) {
 
     state = {...state, triggerUseEffect: false}
 
@@ -52,15 +62,15 @@ function stepState(state: StateType, action: {type: string, text?: string}) {
                 state.timerState = "breathing"
                 state.triggerUseEffect = true;
                 requestAnimationFrame((time: number) => {
-                    state.breathCountTimerOffset = time/1000;
-                    state.timerValue = inputs.timerLength;
+                    state.breathCountTimerOffset = time / 1000;
+                    state.timerValue = state.inputs.holdDurations[state.roundNumber - 1];
                 })
             } else if (state.timerState == "breathing") {
                 state.triggerUseEffect = true
                 state.timerState = "holding"
             } else if (state.timerState == "holding") {
                 state.timerState = "recovery"
-                state.timerValue = inputs.recoveryLength;
+                state.timerValue = state.inputs.recoveryLength;
             } else if (state.timerState == "recovery") {
                 state.timerState = "title"
                 state.triggerUseEffect = true;
@@ -68,6 +78,10 @@ function stepState(state: StateType, action: {type: string, text?: string}) {
             }
         }
 
+    } else if (action.type == "startBreathing") {
+        state.pageState = "breathing"
+        state.triggerUseEffect = true;
+        state.roundNumber = 1
     } else if (action.type == "titleUpdate") {
         // breathing title update
         if (action.text != null) {
@@ -78,12 +92,16 @@ function stepState(state: StateType, action: {type: string, text?: string}) {
         if (state.timerValue < 0) {
             state = stepState(state, {type: "step"})
         }
+    } else if (action.type == "setInputs") {
+        if (action.inputs != null) {
+            state.inputs = action.inputs;
+        }
     }
 
 
     // state data update
     if (state.timerState == "title") {
-        state.roundTitleText = "Round "+state.roundNumber+" - "+toTimeString(inputs.timerLength);
+        state.roundTitleText = "Round "+state.roundNumber+" - "+toTimeString(state.inputs.holdDurations[state.roundNumber-1]);
         state.roundDisplayText = state.titleCountdown;
     } else if (state.timerState == "holding") {
         state.roundTitleText = "Hold"
@@ -132,14 +150,13 @@ function getColours(timerState: string) {
         ];
     } else if (timerState == "recovery") {
         return [
-            "rgb(170, 200, 240)",  // Light blue
-            "rgb(190, 210, 220)",  // Blue → neutral
-            "rgb(210, 220, 190)",  // Neutral → green
-            "rgb(230, 210, 160)",  // Green → warm
             "rgb(255, 200, 140)",  // Warm orange
-            "rgb(255, 215, 160)"   // Soft warm yellow
+            "rgb(255, 215, 160)",   // Soft warm yellow
+            "rgb(210, 220, 190)",  // Neutral → green
+            "rgb(230, 210, 160)"  // Green → warm
         ];
     }
+    return []
 }
 
 function stepColour(
@@ -166,6 +183,7 @@ function stepColour(
         }
     } else if (action.type == "updateColsList" && action.newColsList != null) {
         state.colsList = action.newColsList;
+        state.colsListIndex = 0;
     }
 
     return state
@@ -189,18 +207,7 @@ export default function BreathingThing() {
     const [colsInfo, updateColour] = useReducer(stepColour,
         {cols: ["rgb(255, 240, 160)", "rgb(210, 230, 170)", "rgb(180, 220, 180)"],
         progress:0, colsListIndex: 0,
-            // colsList: ["rgb(255, 255, 255)", "rgb(0,0,0)"]}
-        colsList: [
-            "rgb(255, 240, 160)",  // Yellow (soft)
-            "rgb(210, 230, 170)",  // Yellow → Pale Green (blend)
-            "rgb(180, 220, 180)",  // Pale Green
-            "rgb(100, 170, 130)",  // Pale → Dark Green (blend)
-            "rgb(60, 120, 80)",    // Dark Green
-            "rgb(110, 160, 200)",  // Green → Light Blue (blend)
-            "rgb(160, 200, 240)",  // Light Blue
-            "rgb(90, 100, 180)",   // Blue → Purple (blend leaning purple)
-            "rgb(150, 120, 200)"
-        ]}
+        colsList: getColours("title")}
     )
 
     const [widthMul, setWidthMul] = useState(0)
@@ -208,9 +215,6 @@ export default function BreathingThing() {
     const [breathCount, setBreathCount] = useState(1)
 
     const squareSize = 250;
-
-    // breaths per minute
-    const breathingRate = 24;
 
     // title
     useEffect(() => {
@@ -237,11 +241,10 @@ export default function BreathingThing() {
             let frameId: number;
             const animate = (time: number) => {
                 const timer = (time/1000)-state.breathCountTimerOffset;
-                // setTimerTracker(time/1000);
-                const breathProgress = timer/(60/breathingRate);
+                const breathProgress = timer/(60/state.inputs.breathingRate);
 
-                if (breathProgress > inputs.breathCount-0.5) {
-                    const quadraticDropOff = (1-(((breathProgress-inputs.breathCount+0.5)*2)**2)/2)*9/8;
+                if (breathProgress > state.inputs.breathCount-0.5) {
+                    const quadraticDropOff = (1-(((breathProgress-state.inputs.breathCount+0.5)*2)**2)/2)*9/8;
                     setWidthMul(Math.max(quadraticDropOff, 0));
                     if (quadraticDropOff < 0) {
                         updateState({type: "step"});
@@ -284,15 +287,24 @@ export default function BreathingThing() {
         }
     }, [state])
 
+    function doneInputs(inputs: InputsType) {
+        updateState({type: "setInputs", inputs: inputs})
+        updateState({type: "startBreathing"})
+    }
+
     return (
         <div style={{
-            backgroundImage: `radial-gradient(in oklch circle, 
-                    ${colsInfo.cols[2]} ${colsInfo.progress-100}%, 
-                    ${colsInfo.cols[1]} ${colsInfo.progress}%, 
+            backgroundImage: `radial-gradient(circle,
+                    ${colsInfo.cols[2]} ${colsInfo.progress-100}%,
+                    ${colsInfo.cols[1]} ${colsInfo.progress}%,
                     ${colsInfo.cols[0]} ${colsInfo.progress+100}%)`
         }}
              className="flex flex-1 justify-center transition duration-3000 ease-in-out">
             <div className="flex items-center">
+                {state.pageState == "input" &&
+                <BreathingInputs doneFunction={doneInputs}/>
+                }
+                {state.pageState == "breathing" &&
                 <div className="relative text-gray-800 font-semibold">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-5 text-4xl font-semibold w-2xs text-center">
                         {state.roundTitleText}
@@ -302,9 +314,10 @@ export default function BreathingThing() {
                     </div>
                     <div className="shadow-lg bg-blue-300 inset-0 flex items-center justify-center"
                          style={{borderRadius: 1000, width: squareSize, height: squareSize, transform: `scale(${widthMul})`, fontSize: "40px"}}>
-                        {breathCount}/{inputs.breathCount}
+                        {breathCount}/{state.inputs.breathCount}
                     </div>
                 </div>
+                }
             </div>
         </div>
     )

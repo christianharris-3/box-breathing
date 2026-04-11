@@ -12,10 +12,10 @@ export default function Home() {
                     Breathing
                 </h1>
                 <div className="flex gap-4 mt-3.5">
-                    <Link href="/box" className="px-6 py-3 rounded-2xl font-medium bg-blue-300 hover:bg-blue-400 transition">
+                    <Link href="/box" className="px-6 py-3 rounded-2xl font-medium bg-blue-300 hover:bg-blue-400 transition shadow-md">
                         box Breathing
                     </Link>
-                    <Link href="/wimhof" className="px-6 py-3 rounded-2xl font-medium bg-blue-300 hover:bg-blue-400 transition">
+                    <Link href="/wimhof" className="px-6 py-3 rounded-2xl font-medium bg-blue-300 hover:bg-blue-400 transition shadow-md">
                         Wim Hof Breathing
                     </Link>
                 </div>
