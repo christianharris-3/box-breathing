@@ -2,6 +2,7 @@
 
 import {useEffect, useState, useReducer} from "react";
 import {BreathingInputs, InputsType} from "@/app/wimhof/inputs";
+import Link from "next/link";
 
 
 interface StateType {
@@ -75,6 +76,9 @@ function stepState(state: StateType, action: {type: string, text?: string, input
                 state.timerState = "title"
                 state.triggerUseEffect = true;
                 state.roundNumber += 1
+                if (state.roundNumber > state.inputs.holdDurations.length) {
+                    state.pageState = "finished"
+                }
             }
         }
 
@@ -315,6 +319,18 @@ export default function BreathingThing() {
                     <div className="shadow-lg bg-blue-300 inset-0 flex items-center justify-center"
                          style={{borderRadius: 1000, width: squareSize, height: squareSize, transform: `scale(${widthMul})`, fontSize: "40px"}}>
                         {breathCount}/{state.inputs.breathCount}
+                    </div>
+                </div>
+                }
+                {state.pageState == "finished" &&
+                <div className="bg-blue-300 text-gray-800 font-semibold mt-10 p-5 rounded-xl shadow-2xl text-center">
+                    <span className="text-4xl font-bold text-center">Well Done!</span>
+                    <div className="flex gap-2 pt-3">
+                        <button className="px-6 py-3 rounded-2xl font-medium bg-blue-400 hover:bg-blue-500 transition shadow-md"
+                                onClick={() => updateState({type: "startBreathing"})}>Repeat</button>
+                        <Link href="/" className="px-6 py-3 rounded-2xl font-medium bg-blue-400 hover:bg-blue-500 transition shadow-md">
+                            Home
+                        </Link>
                     </div>
                 </div>
                 }

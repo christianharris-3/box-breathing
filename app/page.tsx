@@ -3,6 +3,14 @@
 // import {Link} from "react-router-dom";
 import Link from "next/link";
 
+
+// TODO (wimhof):
+// [ ] hold breathing button
+// [ ] add end screen
+// [ ] menu bar for progress + back button
+// [ ] improve animations
+// [ ] change breathing to separate page with get or use local storage?
+
 export default function Home() {
 
     return (
