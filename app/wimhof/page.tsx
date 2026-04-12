@@ -300,10 +300,10 @@ export default function BreathingThing() {
                     ${colsInfo.cols[0]} ${colsInfo.progress+100}%)`
         }}
              className="flex flex-1 justify-center transition duration-3000 ease-in-out">
-            <div className="flex items-center">
-                {state.pageState == "input" &&
+            {state.pageState == "input" &&
                 <BreathingInputs doneFunction={doneInputs}/>
-                }
+            }
+            <div className="flex items-center">
                 {state.pageState == "breathing" &&
                 <div className="relative text-gray-800 font-semibold">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-5 text-4xl font-semibold w-2xs text-center">
