@@ -6,8 +6,8 @@ import Link from "next/link";
 
 // TODO (wimhof):
 // [ ] hold breathing button
-// [ ] add end screen
-// [ ] menu bar for progress + back button
+// [x] add end screen
+// [x] menu bar for progress + back button
 // [ ] improve animations
 // [ ] change breathing to separate page with get or use local storage?
 

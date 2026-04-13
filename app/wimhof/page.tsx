@@ -296,6 +296,16 @@ export default function BreathingThing() {
         updateState({type: "startBreathing"})
     }
 
+    // calculate progress value
+    let exerciseProgress = (state.roundNumber-1)/state.inputs.holdDurations.length
+    if (state.timerState == "breathing") {
+        exerciseProgress += 1/state.inputs.holdDurations.length/4
+    } else if (state.timerState == "holding") {
+        exerciseProgress += 2 / state.inputs.holdDurations.length / 4
+    } else if (state.timerState == "recovery") {
+        exerciseProgress += 3/state.inputs.holdDurations.length/4
+    }
+
     return (
         <div style={{
             backgroundImage: `radial-gradient(circle,
@@ -335,6 +345,18 @@ export default function BreathingThing() {
                 </div>
                 }
             </div>
+            {state.pageState == "breathing" &&
+            <div className="flex items-center bg-blue-300 text-gray-800 absolute mt-3 p-1 pl-1 pr-3 rounded-xl shadow-xl gap-2">
+                <Link className="rounded-2xl pl-2 pr-2 bg-blue-400 hover:bg-blue-500 transition shadow-md"
+                    href="/wimhof">Back</Link>
+                <span>Wim Hof Breathing - Round {state.roundNumber}</span>
+                {/*<progress value={exerciseProgress} className="--web"></progress>*/}
+                <div className="relative w-2xs h-5 bg-blue-200 rounded-sm flex items-center justify-center">
+                    <div className="absolute left-0 top-0 bg-blue-400 h-5 transition-all duration-1000 ease-in-out rounded-l-sm z-0"
+                         style={{width: exerciseProgress*288}}> </div>
+                    <span className="relative z-10">Progress {Math.round(exerciseProgress*100)}%</span>
+                </div>
+            </div>}
         </div>
     )
 }
