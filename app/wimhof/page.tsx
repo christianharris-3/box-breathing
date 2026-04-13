@@ -111,8 +111,9 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
                             onClick={addDuration}>New</button>
                 </div>
                 {/* Complete Button */}
-                <button className="px-3 py-3 mt-4 w-full rounded-2xl font-semibold bg-green-400 hover:bg-green-500 transition shadow-md">
-                      <Link href={getUrl({
+                <button className="mt-4 w-full rounded-2xl font-semibold bg-green-400 hover:bg-green-500 transition shadow-md">
+                      <Link className="px-3 py-3 w-full h-full block"
+                        href={getUrl({
                           breathingRate: breathingRate,
                           holdDurations: holdDurations,
                           recoveryLength: recoveryTime,
