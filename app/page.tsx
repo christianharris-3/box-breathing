@@ -4,7 +4,7 @@
 import Link from "next/link";
 
 
-// TODO (wimhof):
+// TODO (wimhof-breathing):
 // [ ] hold breathing button
 // [x] add end screen
 // [x] menu bar for progress + back button
