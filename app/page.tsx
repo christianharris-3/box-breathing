@@ -9,7 +9,8 @@ import Link from "next/link";
 // [x] add end screen
 // [x] menu bar for progress + back button
 // [ ] improve animations
-// [ ] change breathing to separate page with get or use local storage?
+// [x] change breathing to separate page with get or use local storage?
+// [] add back buttons/web navigation bar type thing
 
 export default function Home() {
 

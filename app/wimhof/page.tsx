@@ -29,8 +29,9 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
     const [holdDurations, setHoldDurations] = useState<Array<number>>([90, 120, 150, 180]);
 
     function deleteDuration(index: number) {
-        holdDurations.splice(index, 1)
-        setHoldDurations(holdDurations);
+        const holdDurationsCopy = [...holdDurations]
+        holdDurationsCopy.splice(index, 1)
+        setHoldDurations(holdDurationsCopy);
     }
     function addDuration() {
         setHoldDurations([...holdDurations, (holdDurations.length+3)*30])
@@ -110,18 +111,23 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
                     <button className="p-1 pl-3 pr-3 m-2 mt-0 rounded-2xl font-semibold bg-blue-400 hover:bg-blue-500 transition shadow-md"
                             onClick={addDuration}>New</button>
                 </div>
-                {/* Complete Button */}
-                <button className="mt-4 w-full rounded-2xl font-semibold bg-green-400 hover:bg-green-500 transition shadow-md">
-                      <Link className="px-3 py-3 w-full h-full block"
-                        href={getUrl({
-                          breathingRate: breathingRate,
-                          holdDurations: holdDurations,
-                          recoveryLength: recoveryTime,
-                          breathCount: breathingCountPerRound
-                      })}>
-                    Start
+                {/* Complete + Back Button */}
+                <div className="flex gap-4 mt-4">
+                    <button className="w-full rounded-2xl font-semibold bg-green-400 hover:bg-green-500 transition shadow-md">
+                          <Link className="px-3 py-3 w-full h-full block"
+                            href={getUrl({
+                              breathingRate: breathingRate,
+                              holdDurations: holdDurations,
+                              recoveryLength: recoveryTime,
+                              breathCount: breathingCountPerRound
+                          })}>
+                        Start
+                        </Link>
+                    </button>
+                    <Link href="/" className="px-3 py-3 rounded-2xl bg-blue-400 hover:bg-blue-500 transition shadow-md">
+                        Back
                     </Link>
-                </button>
+                </div>
             </div>
         </div>
     )
