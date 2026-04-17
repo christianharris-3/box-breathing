@@ -37,14 +37,28 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
         setHoldDurations([...holdDurations, (holdDurations.length+3)*30])
     }
     function editDuration(inputTime: string, index: number, isSeconds: boolean) {
-        const timeNumber: number = parseInt(inputTime);
+        let timeNumber: number = parseInt(inputTime);
         if (timeNumber == null || isNaN(timeNumber)) return
         let newTime: number;
         if (isSeconds) {
+            if (timeNumber> 59) {timeNumber = 59}
             newTime = timeNumber + Math.floor(holdDurations[index] / 60)*60;
         } else {
+            if (timeNumber> 9) {timeNumber = 9}
             newTime = timeNumber*60 + holdDurations[index] % 60;
         }
+        if (newTime > 9*60+59) newTime = 9*60+59
+        else if (newTime < 0) newTime = 0
+
+        const copy = [...holdDurations];
+        copy[index] = newTime;
+        setHoldDurations(copy);
+    }
+    function addTimeAndRound(index, time) {
+        let newTime = holdDurations[index]
+        newTime = Math.round(newTime/Math.abs(time))*Math.abs(time)+time
+        if (newTime > 9*60+59) newTime = 9*60+59
+        else if (newTime < 0) newTime = 0
         const copy = [...holdDurations];
         copy[index] = newTime;
         setHoldDurations(copy);
@@ -65,7 +79,7 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
                     </div>
                     <input className="w-full accent-blue-500"
                            type="range" min="10" max="60" defaultValue={breathingCountPerRound}
-                           onChange={event => setBreathingCountPerRound(parseInt(event.target.value))}/>
+                           onBlur={event => setBreathingCountPerRound(parseInt(event.target.value))}/>
                 </div>
                 <div className="mb-5">
                     <div className="flex justify-between font-medium">
@@ -74,7 +88,7 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
                     </div>
                     <input className="w-full accent-blue-500"
                            type="range" min="5" max="30" defaultValue={recoveryTime}
-                           onChange={event => setRecoveryTime(parseInt(event.target.value))}/>
+                           onBlur={event => setRecoveryTime(parseInt(event.target.value))}/>
                 </div>
                 <div className="mb-5">
                     <div className="flex justify-between font-medium">
@@ -92,15 +106,26 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
                     <div className="font-semibold">
                         {holdDurations.map((value, index) => (
                             <div key={index} className="flex justify-between m-2 bg-blue-300 items-center gap-3 p-1 pl-3 rounded-xl drop-shadow-sm">
-                                <div>
-                                    <span>Duration </span>
-                                    <input className="text-right"
-                                        type="number" defaultValue={Math.floor(value / 60)} min="0" max="99"
+                                <span>Round {index+1}: </span>
+                                <div className="bg-blue-400 rounded-2xl p-1">
+                                    <input className="text-right w-6"
+                                        type="text" inputMode="numeric" value={Math.floor(value / 60)} min={0} max={99} maxLength={2}
+                                        onFocus={(event)=>{event.target.select()}}
                                         onChange={event => editDuration(event.target.value, index, false)}/>
                                     :
-                                    <input type="number" defaultValue={Math.floor(value % 60)} min="0" max="59"
-                                           onChange={event => editDuration(event.target.value, index, true)}/>
+                                    <input className="w-7"
+                                        type="text" inputMode="numeric" value={Math.floor(value % 60).toString().padStart(2, "0")} min={0} max={999} maxLength={3}
+                                        onFocus={(event)=>{event.target.select()}}
+                                        onChange={event => editDuration(event.target.value, index, true)}/>
                                 </div>
+                                <button className="bg-green-400 hover:bg-green-500 p-1 rounded-md"
+                                    onClick={()=>{addTimeAndRound(index, -15)}}>
+                                    -15s
+                                </button>
+                                <button className="bg-green-400 hover:bg-green-500 p-1 rounded-md"
+                                    onClick={()=>{addTimeAndRound(index, 15)}}>
+                                    +15s
+                                </button>
                                 <button className="mr-2 text-red-500 hover:text-red-700 font-bold"
                                     onClick={() => deleteDuration(index)}>
                                     ✕
@@ -109,7 +134,8 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
                         ))}
                     </div>
                     <button className="p-1 pl-3 pr-3 m-2 mt-0 rounded-2xl font-semibold bg-blue-400 hover:bg-blue-500 transition shadow-md"
-                            onClick={addDuration}>New</button>
+                            onClick={addDuration}>New Round
+                    </button>
                 </div>
                 {/* Complete + Back Button */}
                 <div className="flex gap-4 mt-4">
