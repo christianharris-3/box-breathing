@@ -54,7 +54,7 @@ export default function BreathingInputs(){//{doneFunction}:{doneFunction: (arg0:
         copy[index] = newTime;
         setHoldDurations(copy);
     }
-    function addTimeAndRound(index, time) {
+    function addTimeAndRound(index: number, time: number) {
         let newTime = holdDurations[index]
         newTime = Math.round(newTime/Math.abs(time))*Math.abs(time)+time
         if (newTime > 9*60+59) newTime = 9*60+59
